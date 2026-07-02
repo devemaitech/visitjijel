@@ -1,28 +1,27 @@
 import { useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function AppHandler() {
-  const { id: _id } = useParams();
-  const [_searchParams] = useSearchParams();
-
   useEffect(() => {
     function openApp() {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const currentUrl = window.location.href;
       
-      // For Android - try to open via intent
-      const intentUrl =
-        "intent://" +
-        window.location.hostname +
-        window.location.pathname +
-        window.location.search +
-        "#Intent;scheme=https;package=com.visitjijel.app;end";
+      // First, try direct app link for Android App Links
+      window.location.href = currentUrl;
       
-      // Try to open the app
-      window.location.href = intentUrl;
+      // Then try intent as fallback
+      setTimeout(() => {
+        const intentUrl =
+          "intent://" +
+          window.location.hostname +
+          window.location.pathname +
+          window.location.search +
+          "#Intent;scheme=https;package=com.visitjijel.app;end";
+        
+        window.location.href = intentUrl;
+      }, 300);
       
       // If app doesn't open after 1.5 seconds, redirect to Play Store
-      setTimeout(function () {
+      setTimeout(() => {
         window.location.href = "https://play.google.com/store/apps/details?id=com.visitjijel.app";
       }, 1500);
     }
