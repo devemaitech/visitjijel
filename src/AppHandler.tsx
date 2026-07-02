@@ -2,28 +2,29 @@ import { useEffect } from 'react';
 
 export default function AppHandler() {
   useEffect(() => {
+    let hasRedirectedToPlayStore = false;
+
     function openApp() {
-      const currentUrl = window.location.href;
+      // Try intent first since direct app link reloads the page
+      const intentUrl =
+        "intent://" +
+        window.location.hostname +
+        window.location.pathname +
+        window.location.search +
+        "#Intent;scheme=https;package=com.visitjijel.app;end";
       
-      // First, try direct app link for Android App Links
-      window.location.href = currentUrl;
-      
-      // Then try intent as fallback
-      setTimeout(() => {
-        const intentUrl =
-          "intent://" +
-          window.location.hostname +
-          window.location.pathname +
-          window.location.search +
-          "#Intent;scheme=https;package=com.visitjijel.app;end";
-        
-        window.location.href = intentUrl;
-      }, 300);
+      window.location.href = intentUrl;
       
       // If app doesn't open after 1.5 seconds, redirect to Play Store
-      setTimeout(() => {
-        window.location.href = "https://play.google.com/store/apps/details?id=com.visitjijel.app";
+      const playStoreTimer = setTimeout(() => {
+        if (!hasRedirectedToPlayStore) {
+          hasRedirectedToPlayStore = true;
+          window.location.href = "https://play.google.com/store/apps/details?id=com.visitjijel.app";
+        }
       }, 1500);
+
+      // Clean up timer on unmount
+      return () => clearTimeout(playStoreTimer);
     }
     // Run when page loads
     openApp();
